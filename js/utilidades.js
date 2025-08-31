@@ -1,122 +1,18 @@
 // ===== UTILIDADES GENERALES =====
-
 window.Utils = {
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    },
-    throttle(func, limit) {
-        let inThrottle;
-        return function(...args) {
-            if (!inThrottle) {
-                func.apply(this, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    },
-    formatStatus(status) {
-        const map = { 'alive': 'Vivo', 'dead': 'Muerto', 'unknown': 'Desconocido' };
-        return map[status?.toLowerCase()] || status;
-    },
-    getStatusClass(status) {
-        const map = { 'alive': 'status-alive', 'dead': 'status-dead', 'unknown': 'status-unknown' };
-        return map[status?.toLowerCase()] || 'status-unknown';
-    },
-    formatGender(gender) {
-        const map = { 'male': 'Masculino', 'female': 'Femenino', 'genderless': 'Sin género', 'unknown': 'Desconocido' };
-        return map[gender?.toLowerCase()] || gender;
-    },
-    extractIdFromUrl(url) {
-        if (!url) return null;
-        const matches = url.match(/\/(\d+)\/?$/);
-        return matches ? parseInt(matches[1], 10) : null;
-    },
-    createElement(tag, attributes = {}, content = '') {
-        const element = document.createElement(tag);
-        Object.entries(attributes).forEach(([key, value]) => {
-            if (key === 'className') element.className = value;
-            else if (key === 'dataset') {
-                Object.entries(value).forEach(([dataKey, dataValue]) => element.dataset[dataKey] = dataValue);
-            } else element.setAttribute(key, value);
-        });
-        if (content) element.innerHTML = content;
-        return element;
-    },
-    showError(message) {
-        const errorContainer = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
-        if (errorContainer && errorText) {
-            errorText.textContent = message;
-            errorContainer.style.display = 'block';
-            document.getElementById('charactersGrid').innerHTML = ''; // Clear grid on error
-        }
-    },
-    hideError() {
-        const errorContainer = document.getElementById('errorMessage');
-        if (errorContainer) errorContainer.style.display = 'none';
-    },
-    showLoading() {
-        const spinner = document.getElementById('loadingSpinner');
-        if (spinner) spinner.style.display = 'flex';
-    },
-    hideLoading() {
-        const spinner = document.getElementById('loadingSpinner');
-        if (spinner) spinner.style.display = 'none';
-    },
-    updateResultsCount(message) {
-        const resultsCount = document.getElementById('resultsCount');
-        if (resultsCount) resultsCount.textContent = message;
-    },
-    scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    ThemeManager: class {
-        constructor() {
-            this.theme = localStorage.getItem('theme') || 'light';
-            this.init();
-        }
-        init() {
-            this.applyTheme();
-            this.updateToggleIcon();
-        }
-        toggle() {
-            this.theme = this.theme === 'light' ? 'dark' : 'light';
-            this.applyTheme();
-            this.updateToggleIcon();
-            localStorage.setItem('theme', this.theme);
-        }
-        applyTheme() {
-            document.documentElement.setAttribute('data-theme', this.theme);
-        }
-        updateToggleIcon() {
-            const icon = document.querySelector('.theme-icon');
-            if (icon) icon.textContent = this.theme === 'light' ? '🌙' : '☀️';
-        }
-    },
-    StorageManager: {
-        set(key, value) {
-            try {
-                localStorage.setItem(key, JSON.stringify(value));
-            } catch (e) {
-                console.warn('Error saving to localStorage', e);
-            }
-        },
-        get(key, defaultValue = null) {
-            try {
-                const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultValue;
-            } catch (e) {
-                console.warn('Error reading from localStorage', e);
-                return defaultValue;
-            }
-        }
-    }
+    debounce: (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func(...a), wait); }; },
+    throttle: (func, limit) => { let iT; return (...a) => { if (!iT) { func(...a); iT = true; setTimeout(() => iT = false, limit); } }; },
+    formatStatus: (s) => ({ 'alive': 'Vivo', 'dead': 'Muerto', 'unknown': 'Desconocido' }[s?.toLowerCase()] || s),
+    getStatusClass: (s) => ({ 'alive': 'status-alive', 'dead': 'status-dead', 'unknown': 'status-unknown' }[s?.toLowerCase()] || 'status-unknown'),
+    formatGender: (g) => ({ 'male': 'Masculino', 'female': 'Femenino', 'genderless': 'Sin género', 'unknown': 'Desconocido' }[g?.toLowerCase()] || g),
+    extractIdFromUrl: (url) => url ? parseInt(url.match(/\/(\d+)\/?$/)?.[1] || null, 10) : null,
+    createElement: (tag, attrs = {}, content = '') => { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') el.className = v; else if (k === 'dataset') Object.entries(v).forEach(([dk, dv]) => el.dataset[dk] = dv); else el.setAttribute(k, v); }); if (content) el.innerHTML = content; return el; },
+    showError: (msg) => { const err = document.getElementById('errorMessage'); if (err) { err.querySelector('#errorText').textContent = msg; err.style.display = 'block'; document.getElementById('charactersGrid').innerHTML = ''; } },
+    hideError: () => { const err = document.getElementById('errorMessage'); if (err) err.style.display = 'none'; },
+    showLoading: () => { const s = document.getElementById('loadingSpinner'); if (s) s.style.display = 'flex'; },
+    hideLoading: () => { const s = document.getElementById('loadingSpinner'); if (s) s.style.display = 'none'; },
+    updateResultsCount: (msg) => { const rc = document.getElementById('resultsCount'); if (rc) rc.textContent = msg; },
+    scrollToTop: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+    ThemeManager: class { constructor() { this.theme = localStorage.getItem('theme') || 'light'; this.init(); } init() { this.applyTheme(); this.updateToggleIcon(); } toggle() { this.theme = this.theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', this.theme); this.applyTheme(); this.updateToggleIcon(); } applyTheme() { document.documentElement.setAttribute('data-theme', this.theme); } updateToggleIcon() { const i = document.querySelector('.theme-icon'); if (i) i.textContent = this.theme === 'light' ? '🌙' : '☀️'; } },
+    StorageManager: { set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { console.warn('Error saving to localStorage', e); } }, get(k, d = null) { try { const i = localStorage.getItem(k); return i ? JSON.parse(i) : d; } catch (e) { console.warn('Error reading from localStorage', e); return d; } } }
 };

@@ -35,8 +35,10 @@
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Buscar por nombre..." class="search-input">
                     </div>
-                    <div class="search-box">
-                        <input type="text" id="episodeInput" placeholder="Buscar por episodio..." class="search-input">
+                    <div class="filters">
+                        <select id="episodeFilter" class="filter-select" style="width: 100%; max-width: 500px;">
+                            <option value="">Seleccionar episodio</option>
+                        </select>
                     </div>
                     <div class="filters">
                         <select id="statusFilter" class="filter-select">
@@ -112,5 +114,4 @@
     <script src="js/main.js"></script>
     <script src="js/utilidades.js"></script>
 </body>
-
 </html>
